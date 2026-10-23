@@ -23,5 +23,5 @@ class Config:
         return cls._isinstance
 
     @staticmethod
-    def fetch(key: str, default_calue: Any = None) -> Any:
-        return Config()._dictionary.get(key, default_calue)
+    def fetch(key: str, default_value: Any = None) -> Any:
+        return Config()._dictionary.get(key, default_value)

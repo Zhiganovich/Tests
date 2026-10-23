@@ -26,7 +26,7 @@ class CrudRequester(HttpRequester):
         self.response_spec(response)
         return response
 
-    def delete(self, user_id):
+    def delete(self, user_id: int) -> Response:
         response = requests.delete(
             url=f"{Config.fetch("backendUrl")}{self.endpoint.value.url}/{user_id}",
             headers=self.request_spec
