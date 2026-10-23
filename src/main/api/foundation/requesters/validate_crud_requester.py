@@ -1,5 +1,5 @@
 import allure
-from typing import Optional
+from typing import Optional, Callable
 from src.main.api.configs.config import Config
 from src.main.api.foundation.https_requester import HttpRequester
 from src.main.api.foundation.requesters.crud_requester import CrudRequester
@@ -7,7 +7,7 @@ from src.main.api.models.base_model import BaseModel
 
 
 class ValidateCrudRequester(HttpRequester):
-    def __init__(self,request_spec, endpoint, response_spec):
+    def __init__(self,request_spec, endpoint, response_spec: Callable):
         super().__init__(request_spec, endpoint, response_spec)
         self.crud_requester = CrudRequester(
             request_spec = self.request_spec,

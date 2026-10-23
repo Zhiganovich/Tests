@@ -1,8 +1,16 @@
+from requests import Response
+from typing import Callable
 from src.main.api.foundation.endpoint import Endpoint
+from src.main.api.models.create_user_request import CreateUserRequest
+from src.main.api.models.create_user_response import CreateUserResponse
 from src.main.api.models.credit_repay_request import CreditRepayRequest
+from src.main.api.models.credit_repay_response import CreditRepayResponse
 from src.main.api.models.credit_request import CreditRequest
+from src.main.api.models.credit_response import CreditResponse
 from src.main.api.models.deposit_request import DepositRequest
+from src.main.api.models.deposit_response import DepositResponse
 from src.main.api.models.transfer_user_request import TransferUserRequest
+from src.main.api.models.transfer_user_response import TransferUserResponse
 from src.main.api.specs.requests_spec import RequestsSpec
 from src.main.api.specs.response_spec import ResponseSpec
 from src.main.api.foundation.requesters.validate_crud_requester import ValidateCrudRequester
@@ -10,7 +18,7 @@ from src.main.api.foundation.requesters.crud_requester import CrudRequester
 
 
 class UserSteps:
-    def create_account(self, created_user):
+    def create_account(self, created_user: CreateUserRequest) -> CreateUserResponse:
         response = ValidateCrudRequester(
             request_spec=RequestsSpec.auth_headers(username=created_user.username, password=created_user.password),
             endpoint=Endpoint.USER_CREATE_ACCOUNT,
@@ -20,9 +28,9 @@ class UserSteps:
         return response
 
     def deposit_account(self, deposit_request: DepositRequest,
-                        created_user,
-                        response_spec,
-                        validate_response: bool=True):
+                        created_user: CreateUserRequest,
+                        response_spec: Callable,
+                        validate_response: bool=True) -> DepositResponse | Response:
         if validate_response:
             response = ValidateCrudRequester(
                 request_spec=RequestsSpec.auth_headers(username=created_user.username, password=created_user.password),
@@ -42,9 +50,9 @@ class UserSteps:
         return response
 
     def credit_request(self, credit_request: CreditRequest,
-                       created_user,
-                       response_spec,
-                       validate_response: bool=True):
+                       created_user: CreateUserRequest,
+                       response_spec: Callable,
+                       validate_response: bool=True) -> CreditResponse | Response:
         if validate_response:
             response = ValidateCrudRequester(
                 request_spec=RequestsSpec.auth_headers(username=created_user.username, password=created_user.password),
@@ -63,9 +71,9 @@ class UserSteps:
         return response
 
     def user_transfer(self, transfer_user_request: TransferUserRequest,
-                      created_user,
-                      response_spec,
-                      validate_response: bool=True):
+                      created_user: CreateUserRequest,
+                      response_spec: Callable,
+                      validate_response: bool=True) -> TransferUserResponse | Response:
         if validate_response:
             response = ValidateCrudRequester(
                 request_spec=RequestsSpec.auth_headers(username=created_user.username, password=created_user.password),
@@ -84,9 +92,9 @@ class UserSteps:
         return response
 
     def credit_repay(self, credit_repay_request: CreditRepayRequest,
-                     created_user,
-                     response_spec,
-                     validate_response: bool=True):
+                     created_user: CreateUserRequest,
+                     response_spec: Callable,
+                     validate_response: bool=True) -> CreditRepayResponse | Response:
         if validate_response:
             response = ValidateCrudRequester(
                 request_spec=RequestsSpec.auth_headers(username=created_user.username, password=created_user.password),
