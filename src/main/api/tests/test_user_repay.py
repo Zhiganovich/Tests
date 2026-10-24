@@ -10,17 +10,12 @@ from src.main.api.db.crud.account_crud import AccountDb as Account
 @pytest.mark.api
 class TestUserRepay:
     def test_user_repay(self, api_manager: ApiManager, create_credit: Dict, db_session: Session) -> None:
-        create_account_response = create_credit["account"]
-        user_data = create_credit["user"]
-        credit_response = create_credit["credit_response"]
-        credit_request = create_credit["credit_request"]
-
-        repay_credit_request = CreditRepayRequest(creditId=credit_response.creditId,
-                                                  accountId=create_account_response.id,
-                                                  amount=credit_request.amount
+        repay_credit_request = CreditRepayRequest(creditId=create_credit["credit_response"].creditId,
+                                                  accountId=create_credit["account"].id,
+                                                  amount=create_credit["credit_request"].amount
                                                   )
         repay_credit_response = api_manager.user_steps.credit_repay(repay_credit_request,
-                                                                    user_data,
+                                                                    create_credit["user"],
                                                                     ResponseSpec.success_code(),
                                                                     validate_response=True
                                                                     )
@@ -30,11 +25,11 @@ class TestUserRepay:
         assert repay_credit_response.amountDeposited == repay_credit_request.amount, \
             "API: Сумма погашения в ответе не соответствует отправленной"
 
-        credit_from_db = Credit.credit_by_id(db_session, credit_response.id)
+        credit_from_db = Credit.credit_by_id(db_session, create_credit["credit_response"].id)
         assert credit_from_db.balance == 0, \
             "DB: После полного погашения задолженность по кредиту должна быть равна 0"
 
-        account_from_db = Account.account_by_id(db_session, create_account_response.id)
+        account_from_db = Account.account_by_id(db_session, create_credit["account"].id)
         assert account_from_db.balance == 0, \
             "DB: После погашения кредита баланс не равен 0"
 
@@ -50,20 +45,15 @@ class TestUserRepay:
     )
     @pytest.mark.negative
     def test_user_repay_invalid(self, amount: int, api_manager: ApiManager, create_credit: Dict, db_session: Session) -> None:
-        create_account_response = create_credit["account"]
-        user_data = create_credit["user"]
-        credit_response = create_credit["credit_response"]
-        credit_request = create_credit["credit_request"]
-
-        credit_before_repay = Credit.credit_by_id(db_session, credit_response.id)
+        credit_before_repay = Credit.credit_by_id(db_session, create_credit["credit_response"].id)
         balance_before_repay = credit_before_repay.balance
 
-        repay_credit_request = CreditRepayRequest(creditId=credit_response.creditId,
-                                                  accountId=create_account_response.id,
+        repay_credit_request = CreditRepayRequest(creditId=create_credit["credit_response"].creditId,
+                                                  accountId=create_credit["account"].id,
                                                   amount=amount
                                                   )
         api_manager.user_steps.credit_repay(repay_credit_request,
-                                            user_data,
+                                            create_credit["user"],
                                             ResponseSpec.unprocessable_code(),
                                             validate_response=False
                                             )
@@ -73,6 +63,6 @@ class TestUserRepay:
             "DB: После отклонённого погашения задолженность по кредиту не должна измениться"
 
 
-        account_from_db = Account.account_by_id(db_session, create_account_response.id)
-        assert account_from_db.balance == credit_request.amount, \
+        account_from_db = Account.account_by_id(db_session, create_credit["account"].id)
+        assert account_from_db.balance == create_credit["credit_request"].amount, \
             "DB: После отклонённого погашения баланс счёта не должен измениться"

@@ -13,12 +13,10 @@ from src.main.api.models.generators.factory import CreateCreditFactory
 class TestUserMakeCredit:
     def test_create_credit_user(self, api_manager: ApiManager, create_account: Callable, db_session: Session) -> None:
         account_data = create_account()
-        user_data = account_data["user"]
-        create_account_response = account_data["account"]
 
-        credit_request = CreateCreditFactory.build(accountId=create_account_response.id)
+        credit_request = CreateCreditFactory.build(accountId=account_data["account"].id)
         credit_response = api_manager.user_steps.credit_request(credit_request,
-                                                                user_data,
+                                                                account_data["user"],
                                                                 ResponseSpec.created_code(),
                                                                 validate_response=True)
         assert credit_request.amount == credit_response.amount, \
@@ -26,7 +24,7 @@ class TestUserMakeCredit:
         assert credit_request.amount == credit_response.balance, \
             "API: Баланс не равен запрашиваемой сумме кредита"
 
-        account_from_db = Account.account_by_id(db_session, create_account_response.id)
+        account_from_db = Account.account_by_id(db_session, account_data["account"].id)
         assert account_from_db.balance == credit_request.amount, \
             "DB: Баланс не равен запрашиваемой сумме кредита"
 
@@ -48,16 +46,14 @@ class TestUserMakeCredit:
     @pytest.mark.negative
     def test_create_credit_invalid(self, amount: int | float, api_manager: ApiManager, create_account: Callable, db_session: Session) -> None:
         account_data = create_account()
-        user_data = account_data["user"]
-        create_account_response = account_data["account"]
 
-        credit_request = CreditRequest(accountId=create_account_response.id, amount=amount, termMonths=12)
+        credit_request = CreditRequest(accountId=account_data["account"].id, amount=amount, termMonths=12)
         api_manager.user_steps.credit_request(credit_request,
-                                              user_data,
+                                              account_data["user"],
                                               ResponseSpec.bad_code(),
                                               validate_response=False
                                               )
 
-        account_from_db = Account.account_by_id(db_session, create_account_response.id)
+        account_from_db = Account.account_by_id(db_session, account_data["account"].id)
         assert account_from_db.balance == 0, \
             "DB: После отклоненного кредита, баланс должен равняться 0"
