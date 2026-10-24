@@ -1,6 +1,5 @@
-# Здесь храним реквест хидеры
 import requests
-
+from typing import Dict
 from src.main.api.models.login_user_request import LoginUserRequest
 from src.main.api.models.login_user_response import LoginUserResponse
 
@@ -8,14 +7,14 @@ from src.main.api.models.login_user_response import LoginUserResponse
 class RequestsSpec:
     # base_url = "http://localhost:4111"
     @staticmethod
-    def base_headers():
+    def base_headers() -> Dict[str, str]:
         return {
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
 
     @staticmethod
-    def auth_headers(username: str, password: str):
+    def auth_headers(username: str, password: str) -> Dict[str, str]:
         login_request = LoginUserRequest(username=username, password=password)
         response = requests.post(
             url="http://localhost:4111/api/auth/token/login",

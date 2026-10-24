@@ -5,7 +5,7 @@ from src.main.api.steps.admin_steps import AdminSteps
 
 
 @pytest.fixture
-def created_obj():
+def created_obj() -> List[Any]:
     users: List[Any]=[]
     yield users
     for user in users:

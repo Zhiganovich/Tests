@@ -1,3 +1,4 @@
+from requests import Response
 from src.main.api.foundation.endpoint import Endpoint
 from src.main.api.foundation.requesters.validate_crud_requester import ValidateCrudRequester
 from src.main.api.models.create_user_request import CreateUserRequest
@@ -20,7 +21,7 @@ class AdminSteps(BaseSteps):
 
         return response
 
-    def delete_user(self, user_id: str):
+    def delete_user(self, user_id: int) -> Response | None:
         CrudRequester(
             request_spec=RequestsSpec.auth_headers(username="admin", password="123456"),
             endpoint=Endpoint.ADMIN_DELETE_USER,
